@@ -28,9 +28,10 @@ public class Member{
         return team;
     }
 
-    public void setTeam(Team team) {
+    public void changeTeam(Team team) {
         this.team = team;
-    }
+        team.getMembers().add(this);
+    }// 연관 관계 편의 메서드
 
     public Long getId() {
         return id;
