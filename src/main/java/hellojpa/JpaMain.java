@@ -21,48 +21,31 @@ import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
+
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
 
         try{
+            Order order = new Order();
+            order.addOrderItem(new OrderItem());
+            // order를 통해서 item을 조회하는 것은 비지니스적으로 굉장히 빈번히 발생
+            // 따라서, order에서 item에 접근할 수 있도록 양방향 연관관계를 맺는다.
+            // 개발 상의 편의를 위해 양방향 연관관계 구현
 
-            Team team = new Team();
-            team.setName("TeamA");
-//            team.getMembers().add(member);
-            em.persist(team);
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
 
-            Member member = new Member();
-            member.setUsername("member1");
-            member.changeTeam(team);
-            em.persist(member);
-
-//            team.getMembers().add(member);
-//            // 주인이 아닌 것을 통한 삽입은 외래 키 값을 변경할 수 없
-//
-//            em.flush();
-//            em.clear();
-
-
-            Team findTeam = em.find(Team.class, team.getId());
-            List<Member> members = findTeam.getMembers();
-
-            System.out.println("================");
-            for(Member m : members){
-                System.out.println("Member : " + m.getUsername());
-            }// == 사이에 아무 것도 찍히지 않는다. 영속성 컨텍스트에 team에 member 커넥션이 없는 채로 저장되었기 떄문
-            System.out.println("================");
-
-            tx.commit();
+            em.persist(orderItem);
 
         }catch(Exception e){
             tx.rollback();
         }finally{
             em.close();
+
         }
         emf.close();
-
 
     }
 }
