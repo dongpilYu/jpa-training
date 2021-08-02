@@ -28,16 +28,35 @@ public class JpaMain {
         tx.begin();
 
         try{
-            Order order = new Order();
-            order.addOrderItem(new OrderItem());
-            // order를 통해서 item을 조회하는 것은 비지니스적으로 굉장히 빈번히 발생
-            // 따라서, order에서 item에 접근할 수 있도록 양방향 연관관계를 맺는다.
-            // 개발 상의 편의를 위해 양방향 연관관계 구현
+            Team team = new Team();
+            team.setName("teamA");
+//          team.getMembers().add(member);
+//          연관관계의 주인이 아닌 team은 값을 추가/수정할 수 없다.
+            em.persist(team);
 
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(order);
+            Member member = new Member();
+            member.setUsername("member1");
+            em.persist(member);
+//            member.setTeamId(team.getId());
 
-            em.persist(orderItem);
+            em.flush();
+            em.clear();
+
+            Member findMember = em.find(Member.class, member.getId());
+            List<Member> members = findMember.getTeam().getMembers();
+            for(Member m : members){
+                System.out.println("m = " + m.getUsername());
+            }
+
+//            Team findTeam = findMember.getTeam();
+//            System.out.println("findTeam = " + findTeam.getName());
+//            Long findTeamId = findMember.getTeamId();
+
+
+
+            Team newTeam = em.find(Team.class, 100L);
+            findMember.setTeam(newTeam);
+            tx.commit();
 
         }catch(Exception e){
             tx.rollback();
